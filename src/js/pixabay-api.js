@@ -2,10 +2,7 @@ import iziToast from 'izitoast';
 import 'izitoast/dist/css/iziToast.min.css';
 import axios from 'axios';
 
-let currentQuery = '';
-
 async function fetchImages(query, page = 1) {
-  currentQuery = query;
   const BASE_URL = 'https://pixabay.com/api/';
   const params = new URLSearchParams({
     key: '44613226-2c9c9ee480393e9e269050800',
@@ -22,11 +19,13 @@ async function fetchImages(query, page = 1) {
     const totalHits = data.totalHits;
     if (totalHits === 0) {
       urlError();
+      return { images: [], totalHits: 0 };
     } else {
-      return data.hits;
+      return { images: data.hits, totalHits: totalHits };
     }
   } catch (error) {
     console.error(error.message);
+    throw error;
   }
 }
 
@@ -48,7 +47,7 @@ const urlError = () =>
     ...optionsError,
   });
 
-const showError = message =>
+const showError = () =>
   iziToast.error({
     message: 'Please! Type something.',
     backgroundColor: '#CB1E1E',
@@ -62,4 +61,4 @@ const endOfSearchResults = () =>
     ...optionsError,
   });
 
-export { currentQuery, fetchImages, urlError, showError, endOfSearchResults };
+export { fetchImages, urlError, showError, endOfSearchResults };

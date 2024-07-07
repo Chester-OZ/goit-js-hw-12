@@ -1,10 +1,8 @@
 import SimpleLightbox from 'simplelightbox';
 import 'simplelightbox/dist/simple-lightbox.min.css';
-import { fetchImages, currentQuery, endOfSearchResults } from './pixabay-api';
 
 let lightbox;
 const gallery = document.querySelector('.gallery');
-const loadMore = document.querySelector('.js-load-more');
 
 function renderGallery(images) {
   gallery.innerHTML = images.map(image => createImageCard(image)).join('');
@@ -16,11 +14,6 @@ function renderGallery(images) {
       captionsData: 'alt',
     });
   }
-  if (images.length > 0 && images.length < 14) {
-    loadMore.style.display = 'none';
-  } else {
-    loadMore.style.display = 'block';
-  }
 }
 
 function updateGallery(images) {
@@ -30,45 +23,6 @@ function updateGallery(images) {
   );
   if (lightbox) {
     lightbox.refresh();
-  }
-}
-
-loadMore.addEventListener('click', onLoadMore);
-
-let page = 1;
-
-async function onLoadMore() {
-  if (!currentQuery) {
-    return;
-  }
-
-  page += 1;
-  showLoader();
-
-  try {
-    const images = await fetchImages(currentQuery, page);
-
-    if (!images || images.length === 0) {
-      hideLoader();
-      endOfSearchResults();
-      loadMore.style.display = 'none';
-      return;
-    }
-
-    updateGallery(images);
-
-    const lastCard = gallery.lastElementChild;
-    const cardHeight = lastCard.getBoundingClientRect().height;
-
-    window.scrollBy({
-      left: 0,
-      top: cardHeight * 2,
-      behavior: 'smooth',
-    });
-  } catch (error) {
-    console.error(error.message);
-  } finally {
-    hideLoader();
   }
 }
 
@@ -109,15 +63,7 @@ function hideLoader() {
 }
 
 function clearGallery() {
-  const gallery = document.querySelector('.gallery');
   gallery.innerHTML = '';
 }
 
-export {
-  renderGallery,
-  updateGallery,
-  onLoadMore,
-  showLoader,
-  hideLoader,
-  clearGallery,
-};
+export { renderGallery, updateGallery, showLoader, hideLoader, clearGallery };
